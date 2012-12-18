@@ -1,7 +1,6 @@
 package it.patamau.ld25;
 
 import javax.swing.JApplet;
-import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
 /**
@@ -10,19 +9,16 @@ import javax.swing.SwingUtilities;
  *
  */
 public class MainApplet extends JApplet {
-	
-	private void createGUI(){
-		Game game = new Game();
-		this.getContentPane().add(game.renderer);
-	}
 
 	public void init(){
 		try {
+			final Game game = new Game();
             SwingUtilities.invokeAndWait(new Runnable() {
                 public void run() {
-                    createGUI();
+                	getContentPane().add(game.renderer);
                 }
             });
+    		game.start();
         } catch (Exception e) { 
             System.err.println("createGUI didn't successfully complete");
             e.printStackTrace();

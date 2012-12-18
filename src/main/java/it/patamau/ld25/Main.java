@@ -16,22 +16,35 @@ public class Main extends JFrame {
 		game = new Game();
 	}
 
-	public void createAndShowGUI(){
+	public boolean createAndShowGUI(){
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setSize(600, 600); //FIXME: use statics
 		this.setLocationRelativeTo(null); //center
 		this.getContentPane().add(game.renderer);
 		
-		SwingUtilities.invokeLater(new Runnable(){
-			public void run(){
-				setVisible(true);
-				game.start();
-			}
-		});
+		try{
+			SwingUtilities.invokeAndWait(new Runnable(){
+				public void run(){
+					setVisible(true);
+				}
+			});
+	    } catch (Exception e) { 
+	        System.err.println("createGUI didn't successfully complete");
+	        e.printStackTrace();
+	        return false;
+	    }
+		return true;
+	}
+	
+	public void play(){
+		game.start();
+		this.dispose();
 	}
 	
 	public static void main(final String args[]){
 		Main m = new Main();
-		m.createAndShowGUI();
+		if(m.createAndShowGUI()){
+			m.play();
+		}
 	}
 }

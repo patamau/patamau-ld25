@@ -12,9 +12,7 @@ import it.patamau.ld25.Sprite;
 public class Particle extends Entity {
 	
 	//FIXME: do you think this is smart? I doubt it
-	public static final Particle 
-		SMOKE = new Particle("smoke", "s"), 
-		BLOODSPLAT = new Particle("blood", "bloodsplat");
+	public static final Particle SMOKE = new Particle("smoke", "s");
 
 	public float ttl; //time to leave or time to live, does it matter?
 	
