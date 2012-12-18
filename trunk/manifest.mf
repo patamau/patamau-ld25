@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Built-By: Eclipse Jar Builder
+Main-Class: it.patamau.ld25.Main
+Implementation-Title: LD25
+Implementation-Version: 1
+Implementation-Vendor: Patamau
+Built-Date: 2012-12-17
