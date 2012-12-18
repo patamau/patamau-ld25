@@ -286,6 +286,7 @@ public class Game implements Runnable {
 			b.ttl = player.weapon.ttl;
 			b.explode = player.weapon.explosive;
 			b.hidden=false; //visible again
+			b.sprite.setAngle((float)player.dir.toAngle());
 			support.set(player.dir);
 			support.invert();
 			support.mul(player.weapon.recoil);
