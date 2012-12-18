@@ -8,12 +8,16 @@ import java.awt.event.MouseMotionListener;
 
 public class EntityController implements KeyListener, MouseListener, MouseMotionListener {
 	
+	public final boolean[] keys = new boolean[65535];
+	
 	public boolean up, down, left, right;
 	public boolean run;
 	public int mousex, mousey;
 	public boolean mousepressed;
+	public boolean exit;
 	
 	private void toggleKey(int code, boolean pressed){
+		keys[code]=pressed;
 		switch(code){
 			case KeyEvent.VK_UP:
 			case KeyEvent.VK_W:
@@ -33,6 +37,9 @@ public class EntityController implements KeyListener, MouseListener, MouseMotion
 			break;
 			case KeyEvent.VK_SHIFT:
 				run = pressed;
+			break;
+			case KeyEvent.VK_ESCAPE:
+				exit = pressed;
 			break;
 		}
 	}

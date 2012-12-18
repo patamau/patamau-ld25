@@ -11,6 +11,7 @@ public class Character extends Entity {
 
 	public Character(final String id) {
 		super(id);
+		size = 24f;
 		sprite = Sprite.getSprite("c");
 		hitpoints = 100;
 		weapon = Weapon.FIST.clone();

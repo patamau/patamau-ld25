@@ -21,8 +21,8 @@ public class SceneRenderer extends Canvas {
 	
 	public SceneRenderer(final Scene scene){
 		this.scene = scene;
-		BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
-		Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "blank cursor");
+		final BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+		final Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "blank cursor");
 		this.setCursor(blankCursor);
 	}
 	
@@ -47,7 +47,7 @@ public class SceneRenderer extends Canvas {
 	public void render(int ox, int oy){
 		this.offsetx=ox+this.getWidth()/2;
 		this.offsety=oy+this.getHeight()/2;
-		Graphics g = strategy.getDrawGraphics();
+		final Graphics g = strategy.getDrawGraphics();
 		g.clearRect(0, 0, this.getWidth(), this.getHeight());
 		
 		//map layer

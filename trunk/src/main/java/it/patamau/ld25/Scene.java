@@ -4,9 +4,7 @@ import it.patamau.ld25.entities.Bullet;
 import it.patamau.ld25.entities.Character;
 import it.patamau.ld25.entities.Particle;
 
-import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
 import java.awt.image.DataBufferInt;
 import java.io.IOException;
 import java.util.Collection;
@@ -110,8 +108,8 @@ public class Scene {
 	 */
 	public void splat(final Vector2f pos, final Sprite sprite){
 		final Color4i target = new Color4i(), patch = new Color4i();
-		int hsw = sprite.getWidth()/2;
-		int hsh = sprite.getHeight()/2;
+		final int hsw = sprite.getWidth()/2;
+		final int hsh = sprite.getHeight()/2;
 		for(int x=(int)(pos.x-hsw), sx=0; sx<sprite.getWidth(); ++x, ++sx){
 			for(int y=(int)(pos.y-hsh), sy=0; sy<sprite.getHeight(); ++y, ++sy){
 				//verify we are in range

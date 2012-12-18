@@ -7,17 +7,28 @@ import javax.imageio.ImageIO;
 import java.awt.image.DataBufferInt;
 
 public class Sprite {
-	
+
 	private static final HashMap<String,BufferedImage> imgLib = new HashMap<String,BufferedImage>();
+
+	/**
+	 * Lets use this for all the blood splatting
+	 */
+	public static final Sprite BLOODSPLAT = getSprite("bloodsplat");
 	
+	/**
+	 * Sprite image buffer
+	 * @param resource
+	 * @return
+	 */
 	public static BufferedImage getImg(final String resource){
 		BufferedImage img = imgLib.get(resource);
 		if(null==img){
 			try {
-				URL url = Sprite.class.getResource("/sprites/"+resource+".png");
+				final URL url = Sprite.class.getResource("/sprites/"+resource+".png");
 				img = ImageIO.read(url);
 				imgLib.put(resource, img);
-			} catch (Exception e) {
+			} catch (Throwable e) {
+				System.err.println("Error loading "+resource);
 				e.printStackTrace();
 				return null;
 			}	
@@ -25,6 +36,11 @@ public class Sprite {
 		return img;
 	}
 
+	/**
+	 * Create a new sprite loading the image called with the given resource name
+	 * @param resource
+	 * @return
+	 */
 	public static Sprite getSprite(final String resource){
 		final BufferedImage img = getImg(resource);
 		
@@ -73,6 +89,10 @@ public class Sprite {
 		}
 	}
 	
+	/**
+	 * This is an horrible memory sinkhole, dont use this
+	 * @param scale
+	 */
 	public void setScale(float scale){
 		if(this.scale==scale) return;
 		this.scale=scale;

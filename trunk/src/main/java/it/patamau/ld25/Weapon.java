@@ -3,22 +3,24 @@ package it.patamau.ld25;
 public class Weapon {
 	
 	public static final Weapon
-		FIST = new Weapon("Fist", 10f, 1f, 5f, 5f, 0.5f,0.01f, true),
-		FLAMETHROWER = new Weapon("FlameThrower",25f, 80f, 5f, 5f, 0.02f, 1f, true),
-		REVOLVER = new Weapon("Revolver", 100f, 400f, 1f, 2f, 0.3f, 1f, false),
-		PISTOL = new Weapon("Pistol", 75f, 400f, 1f, 2f, 0.2f, 1f, false),
-		SMG = new Weapon("SubMachineGun",50f, 400f, 1f, 2f, 0.1f, 1f, false),
-		BOLTRIFLE = new Weapon("BoltActionRifle",100f, 600f, 1f, 4f, 0.4f, 1f, false),
-		RIFLE = new Weapon("SemiAutomaticRifle",100f, 600f, 1f, 4f, 0.3f, 1f, false),
-		ASSAULTRIFLE = new Weapon("AssaultRifle",75f, 600f, 1f, 4f, 0.15f, 1f, false),
-		BAZOOKA = new Weapon("Bazooka",500f, 300f, 2f, 50f, 1f, 1f, true);
+		FIST = new Weapon("Fist", 10f, 1f, 5f, 5f, 2, 0.01f, true, "explode"),
+		FLAMETHROWER = new Weapon("FlameThrower", 10f, 120f, 5f, 5f, 20, 1f, true, "explode"),
+		REVOLVER = new Weapon("Revolver", 100f, 600f, 1f, 2f, 3, 1f, false, "pistol"),
+		PISTOL = new Weapon("Pistol", 75f, 600f, 1f, 2f, 4, 1f, false, "pistol"),
+		SMG = new Weapon("SubMachineGun",50f, 600f, 1f, 2f, 10, 1f, false, "smg"),
+		BOLTRIFLE = new Weapon("BoltActionRifle",100f, 1000f, 1f, 4f, 1, 1f, false, "boltrifle"),
+		RIFLE = new Weapon("SemiAutomaticRifle",100f, 1000f, 1f, 4f, 3, 1f, false, "rifle"),
+		ASSAULTRIFLE = new Weapon("AssaultRifle",75f, 1000f, 1f, 4f, 6, 1f, false,"assault"),
+		BAZOOKA = new Weapon("Bazooka",500f, 1000f, 2f, 50f, 1, 1f, true,"explode");
 
 	public final String name;
 	private long lastShotTime, shotInterval;
-	public final float recoil, bulletSpeed, bulletSize, bulletDamage, rof, ttl;
+	public final float recoil, bulletSpeed, bulletSize, bulletDamage, ttl;
+	public final int rof;
 	public final boolean explosive;
+	public final Sfx sfx;
 	
-	private Weapon(final String name, float recoil, float bulletSpeed, float bulletSize, float bulletDamage, float rof, float ttl, boolean explosive){
+	private Weapon(final String name, float recoil, float bulletSpeed, float bulletSize, float bulletDamage, int rof, float ttl, boolean explosive, String sfx){
 		this.name = name;
 		this.recoil = recoil;
 		this.bulletSpeed = bulletSpeed;
@@ -27,12 +29,15 @@ public class Weapon {
 		this.rof = rof;		
 		this.ttl = ttl;
 		this.explosive = explosive;
-		shotInterval = (long)(rof*1000000000f); //get in nanoseconds
+		this.sfx = new Sfx(sfx);
+		
+		//internals
+		shotInterval = 1000000000l/rof;
 		lastShotTime = 0l;
 	}
 	
 	public Weapon clone(){
-		return new Weapon(name, recoil, bulletSpeed, bulletSize, bulletDamage, rof, ttl, explosive);
+		return new Weapon(name, recoil, bulletSpeed, bulletSize, bulletDamage, rof, ttl, explosive, sfx.name);
 	}
 	
 	public boolean equals(Object o){
@@ -42,7 +47,9 @@ public class Weapon {
 					w.bulletDamage==bulletDamage &&
 					w.bulletSize==bulletSize &&
 					w.bulletSpeed==bulletSpeed &&
-					w.rof==rof;
+					w.rof==rof &&
+					w.ttl==ttl &&
+					w.explosive==explosive;
 		}
 		return false;
 	}
@@ -52,7 +59,7 @@ public class Weapon {
 	 * @param time current time in nanoseconds
 	 * @return
 	 */
-	public final boolean canShoot(long time){
+	public final boolean canShoot(final long time){
 		if(time-lastShotTime>shotInterval){
 			lastShotTime = time;
 			return true;

@@ -104,15 +104,15 @@ public class Grid {
 	}
 	
 	public double getDistance(final Vector2f pos, float x, float y){
-		float dx = pos.x-x;
-		float dy = pos.y-y;
+		final float dx = pos.x-x;
+		final float dy = pos.y-y;
 		return Math.sqrt(dx*dx+dy*dy);
 	}
 	
 	public void destroy(final Vector2f pos, final float range){
 		if(range==1f){
-			int x = (int) getInBoundsX(pos.x);
-			int y = (int) getInBoundsY(pos.y);
+			final int x = (int) getInBoundsX(pos.x);
+			final int y = (int) getInBoundsY(pos.y);
 			map[x][y]=0;
 			rgbMap[x+y*width]=Tile.getTile(0).color.argb;
 		}else{

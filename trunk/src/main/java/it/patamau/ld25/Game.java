@@ -16,7 +16,11 @@ import it.patamau.ld25.entities.Particle;
 
 public class Game implements Runnable {
 	
-	public static float spd = 100f, accel = 5f, runmul = 3f;
+	public static float 
+			SPEED_DEF = 100f, 
+			ACCEL_DEF = 5f, 
+			RUN_MUL = 2f, 
+			PUSH_MUL = 0.1f;
 
 	public final Scene scene;
 	public final SceneRenderer renderer;
@@ -27,30 +31,26 @@ public class Game implements Runnable {
 	private final Entity target, gridhit;
 	private final EntityController playerController;
 	
-	private final Thread thread;
 	private boolean stop;
 	
 	private long time, lastTime;
 	private float dt;
 	
-	
 	public Game(){
 		//game environment
 		scene = new Scene("map01");
 		renderer = new SceneRenderer(scene);
-		thread = new Thread(this);
 		support = new Vector2f();
 		ray = new Line2D.Float();
 		
 		//player entity
 		player = new Character("player");
-		player.size = 10f;
 		player.weapon = Weapon.ASSAULTRIFLE.clone();
 		scene.addCharacter(player);
 		
 		//target used to aim with the mouse
 		target = new Entity("target");
-		target.size = 8f;
+		target.size = 10f;
 		target.virtual=true;
 		scene.addEntity(target);
 		
@@ -61,7 +61,6 @@ public class Game implements Runnable {
 		//dummy
 		for(int i=0; i<100; ++i){
 			final Character dummy = new Character("dummy"+i);
-			dummy.size = 10f;
 			dummy.hitpoints=5;
 			dummy.pos.set((float)(Math.random()*scene.grid.width), (float)(Math.random()*scene.grid.height));
 			scene.addCharacter(dummy);
@@ -80,27 +79,18 @@ public class Game implements Runnable {
 		player.pos.set(renderer.getWidth(),renderer.getHeight());
 		
 		stop = false;
-		thread.start();
+		run();
 	}
 	
 	public void stop(){
 		stop = true;
 	}
 	
-	public void playSound(final String resource) throws LineUnavailableException, UnsupportedAudioFileException, IOException{
-		Clip clip = AudioSystem.getClip();
-        AudioInputStream inputStream = AudioSystem.getAudioInputStream(Main.class.getResourceAsStream("/"+resource));
-        clip.open(inputStream);
-        FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-        gainControl.setValue(-20.0f); // Reduce volume by 10 decibels.
-        clip.start(); 
-	}
-	
 	/**
 	 * 
 	 * @param dt delta time in seconds
 	 */
-	private void update(float dt){
+	private void update(){
 		//process particle effects
 		for(Particle p: scene.particles){
 			if(!p.hidden && !p.checkAlive(dt)){
@@ -148,8 +138,8 @@ public class Game implements Runnable {
 				hit.vel.set(0,0);
 			}else{
 				ch.pos.set(support);
-				ch.vel.x-=ch.vel.x*accel*dt;
-				ch.vel.y-=ch.vel.y*accel*dt;
+				ch.vel.x-=ch.vel.x*ACCEL_DEF*dt;
+				ch.vel.y-=ch.vel.y*ACCEL_DEF*dt;
 			}
 			//verify out of bounds and keep it in
 			scene.grid.checkInBounds(ch.pos);
@@ -176,7 +166,8 @@ public class Game implements Runnable {
 				}
 			}
 			//check collision vs obstacle map
-			if(scene.grid.checkCollision(bullet, new Vector2f(_x,_y), gridhit.pos)){
+			support.set(_x, _y);
+			if(scene.grid.checkCollision(bullet, support, gridhit.pos)){
 				final double _d = bullet.pos.getDistanceSquared(gridhit.pos);
 				if(_d<d){
 					d = _d;
@@ -189,7 +180,7 @@ public class Game implements Runnable {
 				if(hit instanceof Character){
 					damage(bullet, (Character)hit);
 					//push character back a bit
-					bullet.vel.mul(0.25f);
+					bullet.vel.mul(PUSH_MUL);
 					hit.vel.add(bullet.vel);
 				}else{
 					damage(bullet, null);
@@ -212,7 +203,8 @@ public class Game implements Runnable {
 	 * @param bullet
 	 */
 	private void damage(final Bullet bullet, final Character directHit){
-		//FIXME: not a generic particle it is... damn		
+		//FIXME: not a generic particle it is... damn	
+		//smoke here
 		final Particle p = scene.getParticle();
 		p.pos.set(bullet.pos);
 		p.ttl=0.5f;
@@ -224,22 +216,24 @@ public class Game implements Runnable {
 				final double d = ch.pos.getDistance(bullet.pos);
 				if(d<(range+ch.size/2f)){
 					ch.dealDamage(bullet);	
-					final Sprite sprite = Sprite.getSprite("bloodsplat");
-					sprite.setAngle((float)(Math.random()*Math.PI*2.0));
-					scene.splat(ch.pos,sprite);
+					Sprite.BLOODSPLAT.setAngle((float)(Math.random()*Math.PI*2.0));
+					scene.splat(ch.pos,Sprite.BLOODSPLAT);
 				}
 			}
 		}else if(directHit!=null){
 			directHit.dealDamage(bullet);
-			final Sprite sprite = Sprite.getSprite("bloodsplat");
-			sprite.setAngle((float)(Math.random()*Math.PI*2.0));
-			scene.splat(directHit.pos,sprite);
+			Sprite.BLOODSPLAT.setAngle((float)(Math.random()*Math.PI*2.0));
+			scene.splat(directHit.pos,Sprite.BLOODSPLAT);
 		}
 		scene.grid.destroy(bullet.pos, bullet.damage);
 		
 	}
 	
 	private void updatePlayer(){
+		if(playerController.exit){
+			stop=true;
+			return;
+		}
 		if(playerController.left ||
 				playerController.right ||
 				playerController.up ||
@@ -257,14 +251,14 @@ public class Game implements Runnable {
 			if(playerController.down){
 				yv=1f;
 			}
-			float playerSpeed = spd;
+			float playerSpeed = SPEED_DEF;
 			if(playerController.run){
-				playerSpeed = spd*runmul;
+				playerSpeed = SPEED_DEF*RUN_MUL;
 			}
 			support.set(xv, yv);
 			support.normalize();
-			player.vel.x+=(support.x*playerSpeed-player.vel.x)*accel*dt;
-			player.vel.y+=(support.y*playerSpeed-player.vel.y)*accel*dt;
+			player.vel.x+=(support.x*playerSpeed-player.vel.x)*ACCEL_DEF*dt;
+			player.vel.y+=(support.y*playerSpeed-player.vel.y)*ACCEL_DEF*dt;
 		}
 		target.pos.set(player.pos.x+playerController.mousex-renderer.getWidth()/2f, 
 				player.pos.y+playerController.mousey-renderer.getHeight()/2f);
@@ -274,7 +268,7 @@ public class Game implements Runnable {
 		player.sprite.setAngle((float)player.dir.toAngle());
 		if(playerController.mousepressed && player.weapon.canShoot(time)){
 			//shot the bullet
-			final Bullet b = scene.getBullet();
+			final Bullet b = scene.getBullet(); //use a bullet factory plz
 			b.pos.set(player.pos);
 			b.pos.x+=player.dir.x*(player.size+b.damage+b.size);
 			b.pos.y+=player.dir.y*(player.size+b.damage+b.size);
@@ -291,18 +285,7 @@ public class Game implements Runnable {
 			support.invert();
 			support.mul(player.weapon.recoil);
 			player.vel.add(support);
-			try {
-				playSound("assault.wav");
-			} catch (LineUnavailableException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (UnsupportedAudioFileException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			player.weapon.sfx.play();
 		}
 	}
 	
@@ -314,8 +297,9 @@ public class Game implements Runnable {
 			lastTime = time;
 			
 			updatePlayer();
-			update(dt);
+			update();
 			renderer.render(-(int)player.pos.x, -(int)player.pos.y);
 		}
+		System.err.println("Stopped");
 	}
 }
