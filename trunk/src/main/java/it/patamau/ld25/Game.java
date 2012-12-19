@@ -303,6 +303,7 @@ public class Game implements Runnable, KeyListener {
 			if(playerController.down){
 				yv=1f;
 			}
+			//FIXME: place this stuff in the Character to handle motion more clearly
 			float playerSpeed = SPEED_DEF;
 			if(playerController.run){
 				playerSpeed = SPEED_DEF*RUN_MUL;

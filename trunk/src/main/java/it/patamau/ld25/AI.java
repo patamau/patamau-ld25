@@ -5,7 +5,7 @@ import it.patamau.ld25.entities.Character;
 
 public class AI {
 	
-	public static float FOV_RANGE = 300f;
+	public static float SHOOT_RANGE = 300f;
 	
 	public Character c; //the controlled character
 	public Scene scene;
@@ -42,10 +42,22 @@ public class AI {
 	public void update(float dt){
 		final Entity e = scene.getCharacter("player"); //this can be done statically
 		if(e.hidden) return;
-		if(c.getDistance(e)<FOV_RANGE&&!scene.grid.checkCollision(c, e.pos, support)){
-			if(c.weapon.canShoot(dt)){
-				fire(e.pos);
+		boolean cansee = !scene.grid.checkCollision(c, e.pos, support);
+		if(cansee){
+			//move toward the player
+			support.set(e.pos);
+			support.diff(c.pos);
+			support.normalize(); //this is the direction to move towards
+			c.dir.set(support);
+			c.vel.x+=(support.x*Game.SPEED_DEF-c.vel.x)*Game.ACCEL_DEF*dt;
+			c.vel.y+=(support.y*Game.SPEED_DEF-c.vel.y)*Game.ACCEL_DEF*dt;
+			if(c.getDistance(e)<SHOOT_RANGE){
+				//if in range shoot
+				if(c.weapon.canShoot(dt)){
+					fire(e.pos);
+				}
 			}
 		}
+		
 	}
 }
