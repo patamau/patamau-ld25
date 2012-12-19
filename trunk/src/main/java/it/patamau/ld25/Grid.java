@@ -52,6 +52,8 @@ public class Grid {
 		return grid;
 	}
 	
+	public static int MAX_FREEAREA_ITERATIONS = 100;
+	
 	public final BufferedImage img;
 	private final int[] rgbMap;
 	public final int[][] map;
@@ -77,25 +79,25 @@ public class Grid {
 	}
 	
 	public float getInBoundsX(float x){
-		if(x<0) x+=width;
+		if(x<0) x = width+x%width;
 		if(x>=width) x%=width;
 		return x;
 	}
 	
 	public float getInBoundsY(float y){
-		if(y<0) y+=height;
+		if(y<0) y = height+y%height;
 		if(y>=height) y%=height;
 		return y;
 	}
 	
 	public int getInBoundsX(int x){
-		if(x<0) x+=width;
+		if(x<0) x = width+x%width;
 		if(x>=width) x%=width;
 		return x;
 	}
 	
 	public int getInBoundsY(int y){
-		if(y<0) y+=height;
+		if(y<0) y = height+y%height;
 		if(y>=height) y%=height;
 		return y;
 	}
@@ -107,7 +109,7 @@ public class Grid {
 	 */
 	public Tile getTile(final Vector2f v){
 		checkInBounds(v);
-		return getTile((int)v.x,(int)v.y);
+		return Tile.getTile(map[(int)v.x][(int)v.y]);
 	}
 	
 	public Tile getTile(int x, int y){
@@ -134,15 +136,29 @@ public class Grid {
 				for(int y=(int)(pos.y-hrange); y<=yrange; ++y){
 					if(getDistance(pos, x, y)>hrange) continue;
 					//verify we are in range
-					x = getInBoundsX(x);
-					y = getInBoundsY(y);
+					final int _x = getInBoundsX(x);
+					final int _y = getInBoundsY(y);
 					//FIXME: destroy
-					map[x][y]=0;
-					rgbMap[x+y*width]=Tile.getTile(0).color.argb;
+					map[_x][_y]=0;
+					rgbMap[_x+_y*width]=Tile.getTile(0).color.argb;
 				}
 			}
 		}
 	}	
+	
+	public boolean isColliding(final Vector2f pos, float size) {
+		final int hsiz = (int)(size/2);
+		final int x0 = getInBoundsX((int)(pos.x-hsiz)),
+				y0 = getInBoundsY((int)(pos.y-hsiz)),
+				x1 = getInBoundsX((int)(pos.x+hsiz)),
+				y1 = getInBoundsY((int)(pos.y+hsiz));
+		for(int x=x0; x<=x1; ++x){
+			for(int y=y0; y<=y1; ++y){
+				if(Tile.getTile(map[x][y]).obstacle) return true;
+			}
+		}
+		return false;
+	}
 	
 	/**
 	 * Cast a ray from src to dest
@@ -194,6 +210,28 @@ public class Grid {
 				sideDistY += deltaDistY; // Y step
 				hit.y += sy;
 			}			
+		}
+		return false;
+	}	
+	
+	/**
+	 * Set a random non colliding position in the given range to the store vector.
+	 * A random position is generated for a MAX_FREEAREA_ITERATIONS maximum number of times
+	 * afterwards it returns false giving up. 
+	 * Be aware this method is not checking against other entities on the scene 
+	 * @param range the range around the vector which should be checked non colliding
+	 * @param offsetx horizontal offset for the random position generator
+	 * @param offsety vertical offset for the random position generator
+	 * @param sizx the horizontal size to generate positions into
+	 * @param sizy the vertical size to generate positions into
+	 * @param store where the coordinates will be stored
+	 * @return true if a valid position has been found, false if not
+	 */
+	public boolean findFreeArea(float range, long offsetx, long offsety, long sizx, long sizy, final Vector2f store){
+		//try with a random position
+		for(int i=0; i<MAX_FREEAREA_ITERATIONS; ++i){
+			store.set(offsetx+(float)(Math.random())*sizx, offsety+(float)(Math.random())*sizy);
+			if(!isColliding(store, range)) return true;
 		}
 		return false;
 	}

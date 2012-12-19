@@ -1,5 +1,12 @@
 package it.patamau.ld25;
 
+/**
+ * This is a weapon instance, not a generic weapon configuration.
+ * If you share a weapon object it won't work because it internally stores
+ * firing parameters and sound effects
+ * @author Rogue
+ *
+ */
 public class Weapon {
 	
 	public static final Weapon
@@ -14,7 +21,8 @@ public class Weapon {
 		BAZOOKA = new Weapon("Bazooka",500f, 1000f, 2f, 50f, 1, 1f, true,"explode");
 
 	public final String name;
-	private long lastShotTime, shotInterval;
+	private float shotTime, shotInterval;
+	private boolean canShoot;
 	public final float recoil, bulletSpeed, bulletSize, bulletDamage, ttl;
 	public final float rof;
 	public final boolean explosive;
@@ -32,8 +40,9 @@ public class Weapon {
 		this.sfx = new Sfx(sfx);
 		
 		//internals
-		shotInterval = (long)(1000000000f/rof);
-		lastShotTime = 0l;
+		shotInterval = 1f/rof;
+		shotTime = 0f;
+		canShoot = true; //initially read to fire!
 	}
 	
 	public Weapon clone(){
@@ -55,16 +64,23 @@ public class Weapon {
 	}
 	
 	/**
-	 * 
+	 * Remember to call doShoot if actually shooting
 	 * @param time current time in nanoseconds
 	 * @return
 	 */
-	public final boolean canShoot(final long time){
-		if(time-lastShotTime>shotInterval){
-			lastShotTime = time;
+	public final boolean canShoot(final float dt){
+		if(canShoot){
+			return true;
+		}else if((shotTime+=dt)>shotInterval){
+			canShoot=true;
 			return true;
 		}else{
 			return false;
 		}
+	}
+	
+	public final void doShoot(){
+		shotTime=0f;
+		canShoot=false;
 	}
 }
