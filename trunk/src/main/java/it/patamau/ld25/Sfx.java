@@ -39,16 +39,16 @@ public class Sfx {
 	}
 	
 	public void play(){
-		System.err.println(this+" play()");
+		//System.err.println(this+" play()");
 		synchronized(clip){
 			if(clip.isRunning() || clip.isActive()) {
 				clip.stop();
-				System.err.println(this+" was running, stopped and reset");
+				//System.err.println(this+" was running, stopped and reset");
 			}
 			clip.setFramePosition(0);
 			clip.setMicrosecondPosition(0);
 			clip.start();
 		}
-		System.err.println(this+" started()");
+		//System.err.println(this+" started()");
 	}
 }

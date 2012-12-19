@@ -16,11 +16,11 @@ public class Weapon {
 	public final String name;
 	private long lastShotTime, shotInterval;
 	public final float recoil, bulletSpeed, bulletSize, bulletDamage, ttl;
-	public final int rof;
+	public final float rof;
 	public final boolean explosive;
 	public final Sfx sfx;
 	
-	private Weapon(final String name, float recoil, float bulletSpeed, float bulletSize, float bulletDamage, int rof, float ttl, boolean explosive, String sfx){
+	private Weapon(final String name, float recoil, float bulletSpeed, float bulletSize, float bulletDamage, float rof, float ttl, boolean explosive, String sfx){
 		this.name = name;
 		this.recoil = recoil;
 		this.bulletSpeed = bulletSpeed;
@@ -32,7 +32,7 @@ public class Weapon {
 		this.sfx = new Sfx(sfx);
 		
 		//internals
-		shotInterval = 1000000000l/rof;
+		shotInterval = (long)(1000000000f/rof);
 		lastShotTime = 0l;
 	}
 	

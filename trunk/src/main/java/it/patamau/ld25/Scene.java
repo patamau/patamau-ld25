@@ -48,10 +48,8 @@ public class Scene {
 			grid = new Grid(200,200);
 		}
 		try{
-			BufferedImage img = ImageIO.read(Scene.class.getResourceAsStream("/"+scenename+".jpg"));
-			background = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
-			backgroundPixels = ((DataBufferInt)background.getRaster().getDataBuffer()).getData();
-			img.getRGB(0, 0, img.getWidth(), img.getHeight(), backgroundPixels, 0, img.getWidth());
+			System.err.println("Loading background image "+scenename+".jpg");
+			background = ImageIO.read(Scene.class.getResourceAsStream("/"+scenename+".jpg"));
 		} catch (IOException e){
 			background = null;
 			e.printStackTrace();
@@ -102,24 +100,27 @@ public class Scene {
 	}
 	
 	
+	//support objects for splatting
+	private final Color4i splatTarget = new Color4i(), splatPath = new Color4i();
+	
 	/**
 	 * Splat a sprite on the rgbMap (eyes-only)
 	 * @param sprite
 	 */
 	public void splat(final Vector2f pos, final Sprite sprite){
-		final Color4i target = new Color4i(), patch = new Color4i();
 		final int hsw = sprite.getWidth()/2;
 		final int hsh = sprite.getHeight()/2;
 		for(int x=(int)(pos.x-hsw), sx=0; sx<sprite.getWidth(); ++x, ++sx){
+			if(x<0) continue;
+			if(x>=background.getWidth()) break;
 			for(int y=(int)(pos.y-hsh), sy=0; sy<sprite.getHeight(); ++y, ++sy){
 				//verify we are in range
-				final int i = x+y*background.getWidth();
-				if(i<0) continue;
-				if(i>=backgroundPixels.length) break;
-				target.setARGB(backgroundPixels[i]);
-				patch.setARGB(sprite.pixels[sx+sy*sprite.getWidth()]);
-				Color4i.blend(patch, target);
-				backgroundPixels[i]=target.argb;
+				if(y<0) continue;
+				if(y>=background.getHeight()) break;
+				splatTarget.setARGB(background.getRGB(x, y));
+				splatPath.setARGB(sprite.pixels[sx+sy*sprite.getWidth()]);
+				Color4i.blend(splatPath, splatTarget);
+				background.setRGB(x, y, splatTarget.argb);
 			}
 		}
 	}
