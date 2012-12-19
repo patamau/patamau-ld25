@@ -57,6 +57,8 @@ public class Grid {
 	public final int[][] map;
 	public final int width, height;
 	
+	private final Vector2f support = new Vector2f();
+	
 	public Grid(int width, int height){
 		this.width = width;
 		this.height = height;
@@ -140,9 +142,7 @@ public class Grid {
 				}
 			}
 		}
-	}
-	
-	private final Vector2f support = new Vector2f();
+	}	
 	
 	/**
 	 * Cast a ray from src to dest

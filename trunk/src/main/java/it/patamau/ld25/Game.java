@@ -98,7 +98,10 @@ public class Game implements Runnable {
 		//update characters and handle collisions
 		for(Character ch: scene.getCharacters()){
 			if(ch.hidden) continue; 
-			if(ch.ai!=null) ch.ai.update(dt, time);
+			if(ch.ai!=null){
+				ch.ai.update(dt, time);
+			}
+			ch.sprite.setAngle((float)ch.dir.toAngle());
 			if(ch.vel.x==0f && ch.vel.y==0f) continue; //don't compute if no velocity has to be applied or if hidden
 			//compute next position
 			support.x = ch.pos.x+ch.vel.x*dt;
