@@ -1,18 +1,11 @@
 package it.patamau.ld25;
 
-import java.awt.geom.Line2D;
-import java.io.IOException;
-
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.FloatControl;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
-
 import it.patamau.ld25.entities.Bullet;
 import it.patamau.ld25.entities.Character;
 import it.patamau.ld25.entities.Particle;
+
+import java.awt.event.KeyEvent;
+import java.awt.geom.Line2D;
 
 public class Game implements Runnable {
 	
@@ -234,6 +227,17 @@ public class Game implements Runnable {
 			stop=true;
 			return;
 		}
+		if(playerController.keys[KeyEvent.VK_0]){
+			player.weapon = Weapon.FIST.clone();
+		}else if(playerController.keys[KeyEvent.VK_1]){
+			player.weapon = Weapon.PISTOL.clone();
+		}else if(playerController.keys[KeyEvent.VK_2]){
+			player.weapon = Weapon.SMG.clone();
+		}else if(playerController.keys[KeyEvent.VK_3]){
+			player.weapon = Weapon.ASSAULTRIFLE.clone();
+		}else if(playerController.keys[KeyEvent.VK_4]){
+			player.weapon = Weapon.BAZOOKA.clone();
+		}
 		if(playerController.left ||
 				playerController.right ||
 				playerController.up ||
@@ -267,6 +271,7 @@ public class Game implements Runnable {
 		player.dir.normalize();
 		player.sprite.setAngle((float)player.dir.toAngle());
 		if(playerController.mousepressed && player.weapon.canShoot(time)){
+			System.err.println("BANG");
 			//shot the bullet
 			final Bullet b = scene.getBullet(); //use a bullet factory plz
 			b.pos.set(player.pos);

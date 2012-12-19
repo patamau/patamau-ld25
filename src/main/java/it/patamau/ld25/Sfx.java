@@ -15,8 +15,6 @@ import javax.sound.sampled.Clip;
 public class Sfx {
 
 	public static final String SFX_FOLDER = "sfx";
-	
-	public boolean exit = false; //this this to true when application quits
 
 	public final String name;
 	private Clip clip;
@@ -35,23 +33,22 @@ public class Sfx {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} 
+		if(clip==null){
+			throw new NullPointerException("Unable to load clip "+soundFileName);
+		}
 	}
 	
-	/**
-	 * Trigger the thread loop
-	 */
 	public void play(){
-		if (clip != null) {
-			new Thread() {
-				public void run() {
-					synchronized (clip) { //this is the trick!
-						clip.stop();
-						clip.setFramePosition(0);
-						clip.setMicrosecondPosition(0);
-						clip.start();
-					}
-				}
-			}.start();
+		System.err.println(this+" play()");
+		synchronized(clip){
+			if(clip.isRunning() || clip.isActive()) {
+				clip.stop();
+				System.err.println(this+" was running, stopped and reset");
+			}
+			clip.setFramePosition(0);
+			clip.setMicrosecondPosition(0);
+			clip.start();
 		}
+		System.err.println(this+" started()");
 	}
 }
