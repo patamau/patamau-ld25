@@ -54,9 +54,12 @@ public class Game implements Runnable {
 		gridhit.virtual=true;
 		
 		//dummy
-		for(int i=0; i<100; ++i){
+		for(int i=0; i<15; ++i){
 			final Character dummy = new Character("dummy"+i);
 			dummy.hitpoints=5;
+			dummy.ai = new AI(); //FIXME
+			dummy.ai.c = dummy;
+			dummy.ai.scene = scene;
 			dummy.pos.set((float)(Math.random()*scene.grid.width), (float)(Math.random()*scene.grid.height));
 			scene.addCharacter(dummy);
 		}
@@ -94,7 +97,9 @@ public class Game implements Runnable {
 		}
 		//update characters and handle collisions
 		for(Character ch: scene.getCharacters()){
-			if((ch.vel.x==0f && ch.vel.y==0f) || ch.hidden) continue; //don't compute if no velocity has to be applied or if hidden
+			if(ch.hidden) continue; 
+			if(ch.ai!=null) ch.ai.update(dt, time);
+			if(ch.vel.x==0f && ch.vel.y==0f) continue; //don't compute if no velocity has to be applied or if hidden
 			//compute next position
 			support.x = ch.pos.x+ch.vel.x*dt;
 			support.y = ch.pos.y+ch.vel.y*dt;
