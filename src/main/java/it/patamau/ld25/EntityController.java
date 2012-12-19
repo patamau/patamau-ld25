@@ -8,7 +8,7 @@ import java.awt.event.MouseMotionListener;
 
 public class EntityController implements KeyListener, MouseListener, MouseMotionListener {
 	
-	public final boolean[] keys = new boolean[65535];
+	public final boolean[] keys = new boolean[65535]; //typed keys
 	
 	public boolean up, down, left, right;
 	public boolean run;
@@ -45,7 +45,6 @@ public class EntityController implements KeyListener, MouseListener, MouseMotion
 	}
 
 	public void keyTyped(KeyEvent e) {
-		//bah
 	}
 
 	public void keyPressed(KeyEvent e) {
@@ -55,7 +54,7 @@ public class EntityController implements KeyListener, MouseListener, MouseMotion
 	public void keyReleased(KeyEvent e) {
 		toggleKey(e.getKeyCode(), false);
 	}
-
+	
 	public void mouseClicked(MouseEvent e) {
 		// TODO Auto-generated method stub
 		

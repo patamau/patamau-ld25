@@ -5,6 +5,8 @@ import it.patamau.ld25.entities.Character;
 
 public class AI {
 	
+	public static float FOV_RANGE = 300f;
+	
 	public Character c; //the controlled character
 	public Scene scene;
 	
@@ -34,12 +36,14 @@ public class AI {
 		support.mul(c.weapon.recoil);
 		c.vel.add(support);
 		c.weapon.sfx.play();
+		c.weapon.doShoot();
 	}
 
-	public void update(float dt, long time){
+	public void update(float dt){
 		final Entity e = scene.getCharacter("player"); //this can be done statically
-		if(!scene.grid.checkCollision(c, e.pos, support)){
-			if(c.weapon.canShoot(time)){
+		if(e.hidden) return;
+		if(c.getDistance(e)<FOV_RANGE&&!scene.grid.checkCollision(c, e.pos, support)){
+			if(c.weapon.canShoot(dt)){
 				fire(e.pos);
 			}
 		}
