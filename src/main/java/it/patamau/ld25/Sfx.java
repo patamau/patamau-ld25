@@ -43,12 +43,11 @@ public class Sfx {
 		synchronized(clip){
 			if(clip.isRunning() || clip.isActive()) {
 				clip.stop();
-				//System.err.println(this+" was running, stopped and reset");
 			}
 			clip.setFramePosition(0);
 			clip.setMicrosecondPosition(0);
-			clip.start();
 		}
+		clip.start();
 		//System.err.println(this+" started()");
 	}
 }

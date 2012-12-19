@@ -10,6 +10,7 @@ public class AI {
 	
 	private final Vector2f support = new Vector2f();
 	
+	//FIXME: bring this one inside the weapon class
 	private void fire(final Vector2f target){
 		final Bullet b = scene.getBullet(); //use a bullet factory plz
 		b.pos.set(c.pos);

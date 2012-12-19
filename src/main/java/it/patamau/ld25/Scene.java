@@ -5,7 +5,6 @@ import it.patamau.ld25.entities.Character;
 import it.patamau.ld25.entities.Particle;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferInt;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -25,7 +24,11 @@ public class Scene {
 	public Grid grid;
 	
 	public BufferedImage background;
-	private int[] backgroundPixels;
+	
+	//support objects for splatting
+	private final Color4i 
+		splatTarget = new Color4i(), 
+		splatPatch = new Color4i();
 	
 	public Scene(final String scenename){
 		characters = new HashMap<String, Character>();
@@ -99,12 +102,8 @@ public class Scene {
 		return b;
 	}
 	
-	
-	//support objects for splatting
-	private final Color4i splatTarget = new Color4i(), splatPath = new Color4i();
-	
 	/**
-	 * Splat a sprite on the rgbMap (eyes-only)
+	 * Splat a sprite on the background (eyes-only)
 	 * @param sprite
 	 */
 	public void splat(final Vector2f pos, final Sprite sprite){
@@ -118,8 +117,8 @@ public class Scene {
 				if(y<0) continue;
 				if(y>=background.getHeight()) break;
 				splatTarget.setARGB(background.getRGB(x, y));
-				splatPath.setARGB(sprite.pixels[sx+sy*sprite.getWidth()]);
-				Color4i.blend(splatPath, splatTarget);
+				splatPatch.setARGB(sprite.pixels[sx+sy*sprite.getWidth()]);
+				Color4i.blend(splatPatch, splatTarget);
 				background.setRGB(x, y, splatTarget.argb);
 			}
 		}
