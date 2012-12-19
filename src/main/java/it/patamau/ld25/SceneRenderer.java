@@ -48,7 +48,7 @@ public class SceneRenderer extends Canvas {
 		final int x = (int)pos.x+offsetx;
 		if(x<0 || x > getWidth()) return false;
 		final int y = (int)pos.y+offsety;
-		if(x<0 || x > getHeight()) return false;
+		if(y<0 || y > getHeight()) return false;
 		return true;
 	}
 	

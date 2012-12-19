@@ -30,12 +30,14 @@ public class Game implements Runnable {
 	private float dt;
 	
 	public Game(){
+		System.err.println("Loading environment...");
 		//game environment
 		scene = new Scene("map01");
 		renderer = new SceneRenderer(scene);
 		support = new Vector2f();
 		ray = new Line2D.Float();
 		
+		System.err.println("Loading entities...");
 		//player entity
 		player = new Character("player");
 		player.weapon = Weapon.ASSAULTRIFLE.clone();
@@ -113,22 +115,23 @@ public class Game implements Runnable {
 			}
 			//check collision vs obstacle map
 			if(scene.grid.checkCollision(ch, support, gridhit.pos)){
-				final double _d = ch.pos.getDistanceSquared(gridhit.pos);
+				final double _d = Math.sqrt(ch.pos.getDistanceSquared(gridhit.pos));
 				if(_d<d){
 					d = _d;
 					hit = gridhit;
 				}
 			}
 			if(hit!=null){ //if hit compute final position and block all	
+				support.set(ch.vel);
 				ch.vel.normalize();
-				final float _d = (float)d - ch.size/2f -hit.size/2f;
-				ch.vel.mul(_d);
-				support.x = (ch.pos.x+ch.vel.x);
-				support.y = (ch.pos.y+ch.vel.y);
-				ch.vel.set(0,0);
-				ch.pos.set(support);
+				d = d - ch.size/2f - hit.size/2f -1f;
+				ch.vel.mul((float)d);
+				ch.pos.set(ch.pos.x+ch.vel.x, ch.pos.y+ch.vel.y);
 				//block the hit entity
-				hit.vel.set(0,0);
+				//FIXME: push it!
+				support.mul(PUSH_MUL);
+				hit.vel.add(support);
+				ch.vel.set(0,0);
 			}else{
 				ch.pos.set(support);
 				ch.vel.x-=ch.vel.x*ACCEL_DEF*dt;
@@ -271,7 +274,6 @@ public class Game implements Runnable {
 		player.dir.normalize();
 		player.sprite.setAngle((float)player.dir.toAngle());
 		if(playerController.mousepressed && player.weapon.canShoot(time)){
-			System.err.println("BANG");
 			//shot the bullet
 			final Bullet b = scene.getBullet(); //use a bullet factory plz
 			b.pos.set(player.pos);

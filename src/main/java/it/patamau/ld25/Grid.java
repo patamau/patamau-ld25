@@ -18,10 +18,12 @@ public class Grid {
 	 */
 	public static Grid loadObstacleMap(final String resource) throws IOException{
 		final URL url = Grid.class.getResource(resource);
+		System.err.println("Loading obstacle map from image "+resource +"...");
 		final BufferedImage img = ImageIO.read(url);
 		//get image size
 		final int width = img.getWidth();
 		final int height = img.getHeight();
+		System.err.println("Preparing grid "+width+"x"+height);
 		final Grid grid = new Grid(width, height);
 		//precompute white color
 		final int white = Color.WHITE.getRGB();
@@ -32,13 +34,20 @@ public class Grid {
 		img.getRGB(0, 0, width, height, rgb, 0, width);
 		//for all the pixels set the obstacle map to either true or false depending on the color
 		int i;
+		System.err.print("Filling the obstacle map >");
+		long last = System.currentTimeMillis();
 		for(int x=0; x<width; ++x){
 			for(int y=0; y<height; ++y){
 				i = x+y*width;
+				if((System.currentTimeMillis()-last)>=500){
+					last = System.currentTimeMillis();
+					System.err.print('.');
+				}
 				grid.map[x][y]=rgb[i]==white?0:1;
 				grid.rgbMap[i]=rgb[i]==white?background:rgb[i];
 			}
 		}
+		System.err.println('<');
 		
 		return grid;
 	}
@@ -133,6 +142,8 @@ public class Grid {
 		}
 	}
 	
+	private final Vector2f support = new Vector2f();
+	
 	/**
 	 * Cast a ray from src to dest
 	 * Store final cell coordinates into hit
@@ -143,8 +154,11 @@ public class Grid {
 	 */
 	public boolean checkCollision(final Entity src, final Vector2f dest, final Vector2f hit){
 		//discrete handling (that's a bad way to round floating points pal!)
-		hit.x = (int) src.pos.x;
-		hit.y = (int) src.pos.y;
+		support.set(src.vel);
+		support.normalize();
+		support.mul(src.size/2f);
+		hit.x = (int) (src.pos.x+support.x);
+		hit.y = (int) (src.pos.y+support.y);
 		final int destX = (int) dest.x;
 		final int destY = (int) dest.y;
 		//compute diff vector and squared constants to compute delta constants
