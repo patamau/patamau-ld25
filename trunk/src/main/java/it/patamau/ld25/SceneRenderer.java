@@ -44,6 +44,14 @@ public class SceneRenderer extends Canvas {
 		}
 	}
 	
+	public boolean inView(final Vector2f pos){
+		final int x = (int)pos.x+offsetx;
+		if(x<0 || x > getWidth()) return false;
+		final int y = (int)pos.y+offsety;
+		if(x<0 || x > getHeight()) return false;
+		return true;
+	}
+	
 	public void render(int ox, int oy){
 		this.offsetx=ox+this.getWidth()/2;
 		this.offsety=oy+this.getHeight()/2;
@@ -51,30 +59,34 @@ public class SceneRenderer extends Canvas {
 		g.clearRect(0, 0, this.getWidth(), this.getHeight());
 		
 		//map layer
-		g.drawImage(scene.background, this.offsetx, this.offsety, null);
-		g.drawImage(scene.grid.img, this.offsetx, this.offsety, null);
+		g.drawImage(scene.background, 0, 0, this.getWidth(), this.getHeight(), 
+				-this.offsetx, -this.offsety, 
+				this.getWidth()-this.offsetx, this.getHeight()-this.offsety, null);
+		g.drawImage(scene.grid.img, 0, 0, this.getWidth(), this.getHeight(), 
+				-this.offsetx, -this.offsety, 
+				this.getWidth()-this.offsetx, this.getHeight()-this.offsety, null);
 		
 		//characters
 		for(Character e: scene.getCharacters()){
-			if(e.hidden) continue;
+			if(e.hidden || !inView(e.pos)) continue;
 			drawEntity(e, g);
 		}
 		
 		//bullets
 		for(Bullet b: scene.bullets){
-			if(b.hidden) continue;
+			if(b.hidden || !inView(b.pos)) continue;
 			drawEntity(b, g);
 		}
 		
 		//entities
 		for(Entity e: scene.getEntities()){
-			if(e.hidden) continue;
+			if(e.hidden || !inView(e.pos)) continue;
 			drawEntity(e, g);
 		}
 		
 		//effects
 		for(Particle p: scene.particles){
-			if(p.hidden) continue;
+			if(p.hidden || !inView(p.pos)) continue;
 			drawEntity(p, g);
 		}
 		
