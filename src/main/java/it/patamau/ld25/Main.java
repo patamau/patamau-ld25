@@ -18,7 +18,7 @@ public class Main extends JFrame {
 
 	public boolean createAndShowGUI(){
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setSize(600, 600); //FIXME: use statics
+		this.setSize(720, 720); //FIXME: use statics
 		this.setLocationRelativeTo(null); //center
 		this.getContentPane().add(game.renderer);
 		
