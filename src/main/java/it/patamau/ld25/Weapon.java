@@ -12,13 +12,13 @@ public class Weapon {
 	public static final Weapon
 		FIST = new Weapon("Fist", 10f, 1f, 5f, 5f, 2, 0.01f, true, "explode"),
 		FLAMETHROWER = new Weapon("FlameThrower", 10f, 120f, 5f, 5f, 20, 1f, true, "explode"),
-		REVOLVER = new Weapon("Revolver", 100f, 600f, 1f, 2f, 3, 1f, false, "pistol"),
-		PISTOL = new Weapon("Pistol", 75f, 600f, 1f, 2f, 4, 1f, false, "pistol"),
-		SMG = new Weapon("SubMachineGun",50f, 600f, 1f, 2f, 10, 1f, false, "smg"),
-		BOLTRIFLE = new Weapon("BoltActionRifle",100f, 1000f, 1f, 4f, 1, 1f, false, "boltrifle"),
-		RIFLE = new Weapon("SemiAutomaticRifle",100f, 1000f, 1f, 4f, 3, 1f, false, "rifle"),
-		ASSAULTRIFLE = new Weapon("AssaultRifle",75f, 1000f, 1f, 4f, 6, 1f, false,"assault"),
-		BAZOOKA = new Weapon("Bazooka",500f, 1000f, 2f, 50f, 1, 1f, true,"explode");
+		REVOLVER = new Weapon("Revolver", 100f, 750f, 1f, 2f, 2f, 1f, false, "pistol"),
+		PISTOL = new Weapon("Pistol", 75f, 600f, 1f, 2f, 3f, 1f, false, "pistol"),
+		SMG = new Weapon("SubMachineGun",50f, 600f, 1f, 2f, 10f, 1f, false, "smg"),
+		BOLTRIFLE = new Weapon("BoltActionRifle",100f, 1000f, 1f, 4f, 1f, 1f, false, "boltrifle"),
+		RIFLE = new Weapon("SemiAutomaticRifle",100f, 1000f, 1f, 4f, 3f, 1f, false, "rifle"),
+		ASSAULTRIFLE = new Weapon("AssaultRifle",75f, 1000f, 1f, 4f, 6f, 1f, false,"assault"),
+		BAZOOKA = new Weapon("Bazooka",500f, 1000f, 2f, 50f, 1f, 1f, true,"explode");
 
 	public final String name;
 	private float shotTime, shotInterval;

@@ -2,7 +2,7 @@ package it.patamau.ld25.entities;
 
 public class Bullet extends Particle {
 	
-	public float damage;
+	public float damage, range; //damange vars
 	public boolean explode;
 
 	public Bullet(final String id) {

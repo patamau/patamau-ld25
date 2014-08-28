@@ -16,7 +16,7 @@ public class Character extends Entity {
 		size = 24f;
 		sprite = Sprite.getSprite("c");
 		hitpoints = 100;
-		weapon = Weapon.BAZOOKA.clone();
+		weapon = Weapon.SMG.clone();
 	}
 
 	public void dealDamage(Bullet b) {

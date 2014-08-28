@@ -65,8 +65,8 @@ public class Sprite {
 	public Sprite(int width, int height){
 		this.width = this.pwidth = width;
 		this.height = this.pheight = height;
-		src = new int[width*height];
-		img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);		
+		src = new int[width*height]; //src is set externally in the getSprite method
+		img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);	
 		pixels = ((DataBufferInt)img.getRaster().getDataBuffer()).getData();
 		
 	}
@@ -95,12 +95,14 @@ public class Sprite {
 	 */
 	public void setScale(float scale){
 		if(this.scale==scale) return;
+		System.err.println("Sprite set scale to "+scale);
 		this.scale=scale;
 		//rescale matrix
-		this.pwidth=(int)(width*scale);
-		this.pheight=(int)(height*scale);		
+		this.pwidth=(int)(width*scale); //at least one pixel
+		this.pheight=(int)(height*scale); //at least one pixel	
 		//create a new matrix with new dimensions
-		pixels = new int[pwidth*pheight];
+		img = new BufferedImage(pwidth, pheight, BufferedImage.TYPE_INT_ARGB);		
+		pixels = ((DataBufferInt)img.getRaster().getDataBuffer()).getData();
 		//fillin pixels
 		updatePixels();
 	}
@@ -137,6 +139,15 @@ public class Sprite {
 		this.angle=angle;
 		//fill in pixels
 		updatePixels();
+	}
+
+	/**
+	 * Change scale according to ratio damage / pixels
+	 * assuming the larger dimension for comparison
+	 * @param size the size in pixels to scale to it's a float because you usually call it from entity.size or bullet.damage which are actually floating points
+	 */
+	public void setSize(float size) {
+		setScale(size/(float)Math.max(width, height));		
 	}
 
 }
