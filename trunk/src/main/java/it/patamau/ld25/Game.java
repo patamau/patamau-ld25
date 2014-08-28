@@ -8,6 +8,33 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.geom.Line2D;
 
+/**
+ * Game contains the main engine loop. Maybe we need to rename it Engine, really.
+ * Here's the game activities:
+ * - Instanciate: prepare all the local data structures, hopefully empty.
+ *   Declare such structures final since there is no need to reallocate them, but just change them.
+ *   Those include support data structures but not pointers, if we need any
+ * - Show: after instanciated it should be possible to show an (empty) graphical interface, if it is required.
+ *   (set an option somewhere, maybe a systenv variable like -Dld25.dedicated=true)
+ *   The empty interface could be used even without any data to show, basically as a graphical console.
+ *   User might need to receive feedback at this stage. 
+ * - Load: game should be able to load an arbitrary set of resources.
+ *   Resources can be loaded either internally (using classpath references) or overloaded by actual files.
+ *   The former should yield the latter.
+ *   Loading a game is more complex task to achieve, so let assume you have something substantial to show now.
+ * - Loop: it's always running under the hood. 
+ *   It must execute in a non-swing thread to avoid conflicts with the Input.
+ *   The loop should proceed in this order:
+ *   1. update time (currentTime, deltaTime)
+ *   2. apply input to associated variables (the system like 'esc' or the player like 'up')
+ *   3. update physics for all phyiscs entities
+ *   4. update ai for all ai entities
+ *   5. update particles for all particles
+ *   6. update GUI entities
+ *   6. render all visible entities
+ * @author Rogue
+ *
+ */
 public class Game implements Runnable, KeyListener {
 	
 	public static float 
@@ -16,9 +43,9 @@ public class Game implements Runnable, KeyListener {
 			RUN_MUL = 2f, 
 			PUSH_MUL = 0.1f;
 	
-	public static long TIME_NORMAL = 1l, TIME_SLOW = 4l;
+	public static float TIME_NORMAL = 1l, TIME_SLOW = 4l;
 	
-	private long timeDiv = TIME_NORMAL;
+	private float timeDiv = TIME_NORMAL;
 
 	public final Scene scene;
 	public final SceneRenderer renderer;
@@ -62,7 +89,7 @@ public class Game implements Runnable, KeyListener {
 		gridhit.virtual=true;
 		
 		//dummy
-		for(int i=0; i<1; ++i){
+		for(int i=0; i<5; ++i){
 			final Character dummy = new Character("dummy"+i);
 			dummy.hitpoints=5;
 			dummy.ai = new AI(); //FIXME
@@ -221,6 +248,7 @@ public class Game implements Runnable, KeyListener {
 		//smoke here
 		final Particle p = scene.getParticle();
 		p.pos.set(bullet.pos);
+		p.sprite.setSize(bullet.damage*2f);
 		p.ttl=0.5f;
 		p.hidden=false;
 		if(bullet.explode){
@@ -231,6 +259,7 @@ public class Game implements Runnable, KeyListener {
 				if(d<(range+ch.size/2f)){
 					ch.dealDamage(bullet);	
 					Sprite.BLOODSPLAT.setAngle((float)(Math.random()*Math.PI*2.0));
+					Sprite.BLOODSPLAT.setSize(bullet.damage+5f);
 					scene.splat(ch.pos,Sprite.BLOODSPLAT);
 					//FIXME: use a spawn function you lazy bitch
 					if(ch.hitpoints<=0){
@@ -247,6 +276,7 @@ public class Game implements Runnable, KeyListener {
 		}else if(directHit!=null){
 			directHit.dealDamage(bullet);
 			Sprite.BLOODSPLAT.setAngle((float)(Math.random()*Math.PI*2.0));
+			Sprite.BLOODSPLAT.setSize(bullet.damage+5f);
 			scene.splat(directHit.pos,Sprite.BLOODSPLAT);
 			//FIXME: use a spawn function you lazy bitch
 			if(directHit.hitpoints<=0){
@@ -304,9 +334,9 @@ public class Game implements Runnable, KeyListener {
 				yv=1f;
 			}
 			//FIXME: place this stuff in the Character to handle motion more clearly
-			float playerSpeed = SPEED_DEF;
+			float playerSpeed = SPEED_DEF;//*timeDiv;
 			if(playerController.run){
-				playerSpeed = SPEED_DEF*RUN_MUL;
+				playerSpeed *= RUN_MUL;
 			}
 			support.set(xv, yv);
 			support.normalize();
